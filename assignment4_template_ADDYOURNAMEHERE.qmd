@@ -21,13 +21,19 @@ library(readr)
 ```
 
 ```{r Reading-Data}
-underemp_total <- read_csv("data/Chart 1_ Underemployed workers, Original.csv")
+underemp_total <- read_csv("data/Chart 1_ Underemployed workers, Original.csv", skip= 1)
 
 underemp_gender <- read_csv("data/Chart 5_ Underemployed workers, by Sex, Original.csv")
 
 underutilisation <- read_csv("data/Underemployment rate and underutilisation rate.csv")
 
 unemployment <- read_csv ("data/Unemployment rate.csv")
+
+readLines(
+  "data/Chart 1_ Underemployed workers, Original.csv",
+  n = 3
+)
+
 ```
 
 
