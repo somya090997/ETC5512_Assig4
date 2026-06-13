@@ -6,17 +6,142 @@ format: html
 editor: visual
 ---
 
-
-::: {.panel-tabset}
-
+::: panel-tabset
 <!-- Task 1 Tab: Data and Documenting -->
+
 ## Data and Documenting
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(janitor)
+library(here)
+library(readr)
+
+```
+
+```{r Reading-Data}
+underemp_total <- read_csv("data/Chart 1_ Underemployed workers, Original.csv")
+
+underemp_gender <- read_csv("data/Chart 5_ Underemployed workers, by Sex, Original.csv")
+
+underutilisation <- read_csv("data/Underemployment rate and underutilisation rate.csv")
+
+unemployment <- read_csv ("data/Unemployment rate.csv")
+```
+
+
+```{r Cleaning-Dataformat}
+#total underemployment 
+
+underemp_total <- underemp_total %>%
+  separate(
+    1,
+    into = c(
+      "month",
+      "hours_reduced",
+      "prefers_more_hours",
+      "total_underemployed"
+    ),
+    sep = ","
+  )
+
+#total underemployment by Gender
+
+underemp_gender <- underemp_gender |> 
+  separate(
+    1,          #Use the first column in the dataframe.
+    into = c(
+      "month",
+      "male_prefers_more_hours",
+      "male_hours_reduced",
+      "female_prefers_more_hours",
+      "female_hours_reduced"
+    ),
+    sep = ","
+  )
+
+#unemployment rate
+
+unemployment <- unemployment |> 
+  separate(
+    1,
+    into = c(
+      "month",
+      "unemployment_rate_trend",
+      "unemployment_rate_sa"
+    ),
+    sep = ","
+  )
+
+#Rate of Underemployment and Underutilisation
+
+underutilisation <- underutilisation |> 
+  separate(
+    1,
+    into = c(
+      "month",
+      "underemployment_rate_trend",
+      "underemployment_rate_sa",
+      "underutilisation_rate_trend",
+      "underutilisation_rate_sa"
+    ),
+    sep = ","
+  )
+
+```
+
+
+```{r Coverting-DataType}
+underemp_total <- underemp_total |>
+  mutate(
+    hours_reduced = parse_number(hours_reduced),
+    prefers_more_hours = parse_number(prefers_more_hours),
+    total_underemployed = parse_number(total_underemployed)
+  )
+
+underemp_gender <- underemp_gender %>%
+  mutate(
+    male_prefers_more_hours = as.numeric(male_prefers_more_hours),
+    male_hours_reduced = as.numeric(male_hours_reduced),
+    female_prefers_more_hours = as.numeric(female_prefers_more_hours),
+    female_hours_reduced = as.numeric(female_hours_reduced)
+  )
+
+underutilisation <- underutilisation %>%
+  mutate(
+    underemployment_rate_trend =
+      as.numeric(underemployment_rate_trend),
+
+    underemployment_rate_sa =
+      as.numeric(underemployment_rate_sa),
+
+    underutilisation_rate_trend =
+      as.numeric(underutilisation_rate_trend),
+
+    underutilisation_rate_sa =
+      as.numeric(underutilisation_rate_sa)
+  )
+
+unemployment <- unemployment %>%
+  mutate(
+    unemployment_rate_trend =
+      as.numeric(unemployment_rate_trend),
+
+    unemployment_rate_sa =
+      as.numeric(unemployment_rate_sa)
+  )
+
+
+```
+
+
 
 ### What's in this section
 
 Here is where you should provide the more comprehensive details about your data and your processing steps.
 
-These are the data details that an "average" blog post reader is not concerned with (Task 1). 
+These are the data details that an "average" blog post reader is not concerned with (Task 1).
 
 ### Remember
 
@@ -24,7 +149,7 @@ Please mention any additional files that you want the markers to review, eg. rea
 
 <!-- Task 2 Tab: Writing your blogpost -->
 
-## Blog post 
+## Blog post
 
 ### What's in this section
 
@@ -32,17 +157,17 @@ Here is where you should write your blogpost! (Task 2)
 
 ### Blogpost Structure
 
-There is no strict structure for you to follow. However, here is a skeleton structure you may find helpful. 
+There is no strict structure for you to follow. However, here is a skeleton structure you may find helpful.
 
-1. Title (is set at the top of this document)
-2. Motivation  
-3. Data  
-4. Analysis     
-5. Conclusions  
-6. References 
-
+1.  Title (is set at the top of this document)
+2.  Motivation\
+3.  Data\
+4.  Analysis\
+5.  Conclusions\
+6.  References
 
 <!-- Task 3 Tab: Behind the Scenes -  -->
+
 ## Behind the Scenes
 
 ### What's in this section
@@ -50,4 +175,4 @@ There is no strict structure for you to follow. However, here is a skeleton stru
 Here is where you should tell us about your reflection on your analysis (Task 3).
 
 Again, these are the details about **your** perspective and the gritty details behind the scenes of your analysis.
-
+:::
