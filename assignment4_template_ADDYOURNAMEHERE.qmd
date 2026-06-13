@@ -24,8 +24,6 @@ library(lubridate)
 library(janitor)
 library(here)
 library(readr)
-library(gganimate)
-
 ```
 
 ```{r Reading-Data}
@@ -463,13 +461,23 @@ ggplot(
 
 ```
 
+### So, Does Gender Matter? 
 
+In conclusion, the question is if men and women are getting affected differently? Not as much as we might expect. Is it a good thing? As an economy, this gives clarity of the actual problem. 
 
-### What's in this section
+While males consistently accounted for a slightly larger share of underemployment, the difference barely changed over the decade and had little impact on labour underutilisation. Instead, the biggest swings in Australia's labour market were driven by broader economic events, most notably the COVID-19 pandemic.
 
-Here is where you should write your blogpost! (Task 2)
+The real story is that underemployment itself remains a major source of unused labour capacity. In other words, Australia's labour market challenge is less about who is underemployed and more about how many workers want more hours than they can get. The findings suggest that improving job quality and access to working hours may be more important than focusing on gender differences alone.
 
-### Blogpost Structure
+### The Cherry On The Cake! 
+
+Do the current mechanism at place tell the whole labour market story? The ABS says not quite. The [U-series framework](https://www.abs.gov.au/articles/underemployment-and-underutilisation-introducing-u-series) has been introduced which will be fully implemented in 2027, looks beyond people without jobs and shines a spotlight on those who have work but not enough of it, along with others who are only loosely connected to the labour force. 
+
+By widening the lens, the U-series reveals that Australia's spare labour capacity is much larger than unemployment figures alone suggest. In short, the labour market is not just about who has a job and who does not—it's also about who wants more work, more hours, or a better opportunity than the one they currently have.
+
+```{r}
+
+```
 
 There is no strict structure for you to follow. However, here is a skeleton structure you may find helpful.
 
