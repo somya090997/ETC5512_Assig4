@@ -1,5 +1,5 @@
 ---
-title: "Understanding Gender Differences in Underemployment contributing to Underutilisation of Labor in Australia"
+title: "Does Gender Differences in Underemployment contribute to Underutilisation of Labour in Australia?"
 subtitle: "Assignment 4 | ETC5512 Wild-Caught Data"
 author: "Somya Verma"
 format:
@@ -24,6 +24,7 @@ library(lubridate)
 library(janitor)
 library(here)
 library(readr)
+library(gganimate)
 
 ```
 
@@ -151,8 +152,6 @@ unemployment <- unemployment |>
     unemployment_rate_trend = as.numeric(unemployment_rate_trend),
     unemployment_rate_sa = as.numeric(unemployment_rate_sa)
   )
-glimpse(underutilisation)
-
 underemp_gender <- underemp_gender |>
   filter(!is.na(month))
 underutilisation <- underutilisation |>
@@ -164,6 +163,9 @@ unemployment <- unemployment |>
 ```
 
 ```{r}
+#| echo: false
+#| results: false
+
 underemp_gender <- underemp_gender |>
   filter(month != "month")
 
@@ -272,7 +274,7 @@ Used separate() from the tidyr package to split comma-separated text columns int
 
 * Ensured all datasets contained consistent date variables and correctly formatted numeric measures.
 
-* Prepared the datasets for merging and analysis of underemployment, unemployment, and labour underutilisation trends. Derived new variables. 
+* Prepared the datasets for merging and analysis of underemployment, unemployment, and labour underutilisation trends. Derived new variables.  
 
 * Focused the analysis on gender differences in underemployment in Australia between 2016 and 2025.
 
@@ -285,26 +287,179 @@ Please mention any additional files that you want the markers to review, eg. rea
 
 ## Blog post
 
-```{r Deriving_Variables}
+### Let us move Beyond Unemployment Rate!  
 
-underemp_gender <- underemp_gender |>
+The unemployment rate is often used to assess labour market performance, but it does not capture all forms of unused labour capacity. Many employed individuals would prefer to work additional hours, making underemployment an important component of labour underutilisation. This blog examines whether gender differences in underemployment contributed to labour underutilisation in Australia between 2016 and 2025 by analysing trends in underemployment, labour underutilisation, and the relative contributions of males and females to underemployed workers.
+
+According to **Australian Bureau of Statistics ** [ABS](https://www.abs.gov.au/statistics/detailed-methodology-information/concepts-sources-methods/labour-statistics-concepts-sources-and-methods/2023/concepts-and-sources/underutilised-labour) labour underutilisation measures the extent to which available labour resources are not fully used in the economy. It combines unemployment and underemployment, providing a broader view of labour market spare capacity than unemployment alone. Underemployment refers to employed individuals who would like to work more hours and are available to do so, or full-time workers whose hours have been reduced for economic reasons.
+
+Using ABS data from 2016 to 2025, this study examines whether differences in male and female contributions to underemployment are associated with changes in labour underutilisation over time.
+
+### Do Underemployment and Underutilisation make sense together?
+
+@fig-underutilisation shows that underemployment and labour underutilisation move almost hand in hand. When underemployment rises, underutilisation rises too, and when it falls, underutilisation follows. This suggests that underemployment is a key contributor to overall labour underutilisation in Australia.
+
+The most noticeable spike occurs during COVID-19 in 2020, when both measures increased dramatically as many workers experienced reduced hours and labour market disruptions. While underutilisation remains consistently higher because it also includes unemployed workers, the similar patterns of the two lines indicate that underemployment plays a major role in explaining unused labour capacity. So are these two variables an item? YES! 
+
+If underemployment contributes so strongly to labour underutilisation, the next question is whether males and females contribute differently to underemployment and whether these differences matter for overall labour market outcomes.
+
+```{r Establishing-Relationship}
+#| label: fig-underutilisation
+#| fig-cap: "Underemployment and labour underutilisation rates in Australia, 2016–2025."
+rates_long <- labour_data |>
+  select(
+    month,
+    underemployment_rate_sa,
+    underutilisation_rate_sa
+  ) |>
+  pivot_longer(
+    cols = c(
+      underemployment_rate_sa,
+      underutilisation_rate_sa
+    ),
+    names_to = "measure",
+    values_to = "rate"
+  )
+
+ggplot(
+  rates_long,
+  aes(
+    x = month,
+    y = rate,
+    colour = measure
+  )
+) +
+  geom_line(linewidth = 1.2) +
+  labs(
+    title = "Underemployment and Labour Underutilisation in Australia",
+    x = "Year",
+    y = "Rate (%)"
+  ) +
+  theme_minimal()
+
+
+
+```
+### Do Males and Females Contribute Differently to Underemployment?
+
+At first glance, Figure @fig-gender-share may look a little uneventful—and that is exactly what makes it interesting. While overall underemployment rose and fell dramatically over the decade, the *split between males and females barely changed*.
+
+Male workers consistently accounted for a slightly larger share of total underemployment, contributing around 52–54% of underemployed workers, while females accounted for approximately 46–48%. Even during the COVID-19 disruption, when underemployment surged across Australia, the gender balance remained remarkably stable.
+
+This suggests that both males and females were affected by changing labour market conditions in broadly similar ways. Rather than one gender driving changes in underemployment, the evidence points to economy-wide factors affecting both groups simultaneously.
+
+Most importantly, the difference between the two groups is relatively small compared with the large swings in overall underemployment observed in @fig-underutilisation. This hints that while gender differences certainly exist, they may not be the main reason labour underutilisation changes over time.
+
+So, if males consistently contributed a slightly larger share of underemployment, the next question becomes: did this difference actually matter? To answer that, the next section examines whether the gender composition of underemployment was related to labour underutilisation using correlation and regression analysis.
+
+```{r Deriving-Gender-Variables}
+#| label: fig-gender-share
+#| fig-cap: "Gender share of total underemployment in Australia, 2016–2025."
+labour_data <- labour_data |>
   mutate(
-    Total_male_underemp =
+    Tot_male_underemp =
       male_prefers_more_hours +
       male_hours_reduced,
-    Total_female_underemp =
+
+    Tot_female_underemp =
       female_prefers_more_hours +
-      female_hours_reduced
+      female_hours_reduced,
+
+    total_underemp =
+      Tot_male_underemp +
+      Tot_female_underemp,
+
+    male_share =
+      Tot_male_underemp /
+      total_underemp * 100,
+
+    female_share =
+      Tot_female_underemp /
+      total_underemp * 100
   )
 
+share_yearly <- labour_data |>
+  mutate(year = year(month)) |>
+  group_by(year) |>
+  summarise(
+    male_share = mean(male_share),
+    female_share = mean(female_share)
+  ) |>
+  pivot_longer(
+    cols = c(male_share, female_share),
+    names_to = "gender",
+    values_to = "share"
+  )
+
+share_yearly |>
+  ggplot(aes(x = factor(year), y = share, colour = gender, group = gender)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Gender Share of Total Underemployment Over Time",
+    x = "Year",
+    y = "Share"
+  ) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme_minimal()
+
+
+
+```
+
+### What Story Does Correlation tells us?
+
+@fig-gender-imbalance puts the research question to the test by examining whether gender differences in underemployment are linked to labour underutilisation. Surprisingly, the answer appears to be "not really".
+
+The scatterplot shows no clear pattern, and the regression line is almost flat. While males consistently accounted for a slightly larger share of underemployment, these differences did not translate into meaningful changes in labour underutilisation. The regression results support this finding, with a non-significant p-value (0.58) and an R² of just 0.003.
+
+In short, gender differences existed, but they were too small and too stable to explain fluctuations in labour underutilisation. Instead, broader economic events, particularly COVID-19, appear to have been the real drivers of changes in labour market spare capacity.
+
+```{r}
+#| label: fig-gender-imbalance
+#| fig-cap: "Relationship between gender imbalance in underemployment and labour underutilisation."
+#| echo: false
+#| results: false
 #Creating a Gender Gap
 
-underemp_gender <- underemp_gender |>
+labour_data <- labour_data |>
   mutate(
-    gender_gap =
-      Total_female_underemp - Total_male_underemp
+    share_gap =
+      male_share -
+      female_share
   )
 
+cor(
+  labour_data$share_gap,
+  labour_data$underutilisation_rate_sa,
+  use = "complete.obs"
+)
+
+model <- lm(
+  underutilisation_rate_sa ~ share_gap,
+  data = labour_data
+)
+
+summary(model)
+
+ggplot(
+  labour_data,
+  aes(
+    x = share_gap,
+    y = underutilisation_rate_sa
+  )
+) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(
+    method = "lm",
+    se = TRUE
+  ) +
+  labs(
+    title = "Gender Imbalance and Labour Underutilisation",
+    x = "Difference in Gender Share (%)",
+    y = "Underutilisation Rate (%)"
+  ) +
+  theme_minimal()
 
 ```
 
