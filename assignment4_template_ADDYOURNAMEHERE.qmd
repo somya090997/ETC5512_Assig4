@@ -93,6 +93,12 @@ underutilisation <- underutilisation |>
     sep = ","
   )
 
+underutilisation <- underutilisation |>
+  filter(month != "")
+
+underutilisation <- underutilisation |>
+  slice(-1)
+
 ```
 
 
@@ -145,10 +151,27 @@ unemployment <- unemployment |>
     unemployment_rate_trend = as.numeric(unemployment_rate_trend),
     unemployment_rate_sa = as.numeric(unemployment_rate_sa)
   )
+glimpse(underutilisation)
+
+underemp_gender <- underemp_gender |>
+  filter(!is.na(month))
+underutilisation <- underutilisation |>
+  filter(!is.na(month))
+
+unemployment <- unemployment |>
+  filter(!is.na(month))
 
 ```
 
 ```{r}
+underemp_gender <- underemp_gender |>
+  filter(month != "month")
+
+head(underemp_gender$month)
+head(underutilisation$month)
+head(unemployment$month)
+
+
 underemp_total <- underemp_total |>
   mutate(
     month = my(month)
@@ -168,6 +191,49 @@ unemployment <- unemployment |>
   mutate(
     month = my(month)
   )
+
+underemp_gender |>
+  count(month) |>
+  filter(n > 1)
+
+underemp_gender <- underemp_gender |>
+  filter(!is.na(month))
+
+underemp_gender |>
+  filter(is.na(month))
+
+underutilisation <- underutilisation |>
+  filter(!is.na(month))
+
+unemployment <- unemployment |>
+  filter(!is.na(month))
+
+underutilisation |>
+  count(month) |>
+  filter(n > 1)
+
+unemployment |>
+  count(month) |>
+  filter(n > 1)
+
+underemp_total |>
+  count(month) |>
+  filter(n > 1)
+
+labour_data <- underemp_gender |>
+  left_join(
+    underutilisation,
+    by = "month"
+  ) |>
+  left_join(
+    unemployment,
+    by = "month"
+  ) |>
+  filter(
+    month >= as.Date("2016-06-01"),
+    month <= as.Date("2025-12-31")
+  )
+
 
 ```
 
@@ -206,7 +272,7 @@ Used separate() from the tidyr package to split comma-separated text columns int
 
 * Ensured all datasets contained consistent date variables and correctly formatted numeric measures.
 
-* Prepared the datasets for merging and analysis of underemployment, unemployment, and labour underutilisation trends.
+* Prepared the datasets for merging and analysis of underemployment, unemployment, and labour underutilisation trends. Derived new variables. 
 
 * Focused the analysis on gender differences in underemployment in Australia between 2016 and 2025.
 
@@ -218,6 +284,31 @@ Please mention any additional files that you want the markers to review, eg. rea
 <!-- Task 2 Tab: Writing your blogpost -->
 
 ## Blog post
+
+```{r Deriving_Variables}
+
+underemp_gender <- underemp_gender |>
+  mutate(
+    Total_male_underemp =
+      male_prefers_more_hours +
+      male_hours_reduced,
+    Total_female_underemp =
+      female_prefers_more_hours +
+      female_hours_reduced
+  )
+
+#Creating a Gender Gap
+
+underemp_gender <- underemp_gender |>
+  mutate(
+    gender_gap =
+      Total_female_underemp - Total_male_underemp
+  )
+
+
+```
+
+
 
 ### What's in this section
 
