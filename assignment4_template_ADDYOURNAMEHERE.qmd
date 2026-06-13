@@ -1,9 +1,16 @@
 ---
-title: "What is your blogpost title? Add it here??"
-subtitle: "Assignment 4 ETC5512"
-author: "Who are you?? Add your name here"
-format: html
+title: "Understanding Gender Differences in Underemployment contributing to Underutilisation of Labor in Australia"
+subtitle: "Assignment 4 | ETC5512 Wild-Caught Data"
+author: "Somya Verma"
+format:
+  html:
+    theme: superhero
+toc: true
 editor: visual
+execute:
+  echo: false
+  warning: false
+  message: false
 ---
 
 ::: panel-tabset
@@ -29,27 +36,18 @@ underutilisation <- read_csv("data/Underemployment rate and underutilisation rat
 
 unemployment <- read_csv ("data/Unemployment rate.csv")
 
-readLines(
-  "data/Chart 1_ Underemployed workers, Original.csv",
-  n = 3
-)
-
 ```
 
 
 ```{r Cleaning-Dataformat}
 #total underemployment 
 
-underemp_total <- underemp_total %>%
-  separate(
-    1,
-    into = c(
-      "month",
-      "hours_reduced",
-      "prefers_more_hours",
-      "total_underemployed"
-    ),
-    sep = ","
+underemp_total <- underemp_total |>
+  rename(
+    month = month,
+    hours_reduced = "Worked less than usual hours for economic reasons ('000) ('000)",
+    prefers_more = "Prefers more hours than usual ('000) ('000)",
+    total_underemp = "Total ('000) ('000)"
   )
 
 #total underemployment by Gender
@@ -99,22 +97,33 @@ underutilisation <- underutilisation |>
 
 
 ```{r Coverting-DataType}
+
 underemp_total <- underemp_total |>
   mutate(
-    hours_reduced = parse_number(hours_reduced),
-    prefers_more_hours = parse_number(prefers_more_hours),
-    total_underemployed = parse_number(total_underemployed)
+    hours_reduced = as.numeric(hours_reduced),
+    prefers_more = as.numeric(prefers_more),
+    total_underemp = as.numeric(total_underemp)
   )
 
-underemp_gender <- underemp_gender %>%
+
+underemp_gender <- underemp_gender |>
   mutate(
-    male_prefers_more_hours = as.numeric(male_prefers_more_hours),
-    male_hours_reduced = as.numeric(male_hours_reduced),
-    female_prefers_more_hours = as.numeric(female_prefers_more_hours),
-    female_hours_reduced = as.numeric(female_hours_reduced)
+    male_prefers_more_hours =
+      as.numeric(male_prefers_more_hours),
+
+    male_hours_reduced =
+      as.numeric(male_hours_reduced),
+
+    female_prefers_more_hours =
+      as.numeric(female_prefers_more_hours),
+
+    female_hours_reduced =
+      as.numeric(female_hours_reduced)
   )
 
-underutilisation <- underutilisation %>%
+underutilisation <- underutilisation |>
+  slice(-1)
+underutilisation <- underutilisation |>
   mutate(
     underemployment_rate_trend =
       as.numeric(underemployment_rate_trend),
@@ -129,25 +138,78 @@ underutilisation <- underutilisation %>%
       as.numeric(underutilisation_rate_sa)
   )
 
-unemployment <- unemployment %>%
+unemployment <- unemployment |>
+  slice(-1)
+unemployment <- unemployment |>
   mutate(
-    unemployment_rate_trend =
-      as.numeric(unemployment_rate_trend),
-
-    unemployment_rate_sa =
-      as.numeric(unemployment_rate_sa)
+    unemployment_rate_trend = as.numeric(unemployment_rate_trend),
+    unemployment_rate_sa = as.numeric(unemployment_rate_sa)
   )
 
+```
+
+```{r}
+underemp_total <- underemp_total |>
+  mutate(
+    month = my(month)
+  )
+
+underemp_gender <- underemp_gender |>
+  mutate(
+    month = my(month)
+  )
+
+underutilisation <- underutilisation |>
+  mutate(
+    month = my(month)
+  )
+
+unemployment <- unemployment |>
+  mutate(
+    month = my(month)
+  )
 
 ```
 
 
+### Data Overview
 
-### What's in this section
+Four datasets were obtained from the Australian Bureau of Statistics (ABS) Labour Force publications to investigate the relationship between gender differences in underemployment and labour underutilisation in Australia. The datasets included total underemployed workers, underemployed workers by sex, underemployment and underutilisation rates, and unemployment rates.
 
-Here is where you should provide the more comprehensive details about your data and your processing steps.
+The data used in this analysis were obtained from the Australian Bureau of Statistics (ABS) [Labour Force Survey](https://www.abs.gov.au/methodologies/labour-force-australia-methodology/apr-2026), a monthly survey of approximately 50,000 individuals designed to measure employment and unemployment outcomes across Australia. The ABS publishes labour market indicators as original, seasonally adjusted, and trend series. For this analysis, seasonally adjusted estimates were used where available because they remove recurring seasonal patterns and allow underlying labour market movements to be compared more effectively over time.
 
-These are the data details that an "average" blog post reader is not concerned with (Task 1).
+The [ABS](https://www.abs.gov.au/methodologies/labour-force-australia-methodology/apr-2026) notes that labour market conditions experienced substantial disruption during the COVID-19 period (April 2020 to March 2022), resulting in increased volatility and several trend breaks. Consequently, caution is exercised when interpreting labour market movements during this period.
+
+#### Data Processing
+
+**Data Import**
+
+* Imported all ABS datasets into R using the `read_csv()` function from the readr package.
+Excluded the title row from the total underemployment dataset using skip = 1.
+
+**Data Cleaning and Transformation**
+
+* Renamed variables to shorter and more interpretable names for ease of analysis.
+Used separate() from the tidyr package to split comma-separated text columns into individual variables.
+
+* Converted labour market measures from `character (chr)` to `numeric (dbl)` data types using `as.numeric()`.
+
+* Removed duplicated header rows from the underutilisation and unemployment datasets using `slice(-1)` to prevent conversion errors and missing values.
+
+**Date Processing**
+
+* Converted the month variable from the original ABS format (e.g., Apr-16) to a date format using `my()` from the `lubridate package`.
+
+* Standardised the time variable across all datasets to support time-series analysis and dataset integration.
+
+**Final Dataset Preparation**
+
+* Ensured all datasets contained consistent date variables and correctly formatted numeric measures.
+
+* Prepared the datasets for merging and analysis of underemployment, unemployment, and labour underutilisation trends.
+
+* Focused the analysis on gender differences in underemployment in Australia between 2016 and 2025.
+
 
 ### Remember
 
