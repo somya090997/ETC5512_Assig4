@@ -240,46 +240,112 @@ labour_data <- underemp_gender |>
 
 ### Data Overview
 
-Four datasets were obtained from the Australian Bureau of Statistics (ABS) Labour Force publications to investigate the relationship between gender differences in underemployment and labour underutilisation in Australia. The datasets included total underemployed workers, underemployed workers by sex, underemployment and underutilisation rates, and unemployment rates.
+This blog investigates: Does gender difference in underemployment contribute to labour underutilisation in Australia? To answer this, three sub-questions guide the analysis:
 
-The data used in this analysis were obtained from the Australian Bureau of Statistics (ABS) [Labour Force Survey](https://www.abs.gov.au/methodologies/labour-force-australia-methodology/apr-2026), a monthly survey of approximately 50,000 individuals designed to measure employment and unemployment outcomes across Australia. The ABS publishes labour market indicators as original, seasonally adjusted, and trend series. For this analysis, seasonally adjusted estimates were used where available because they remove recurring seasonal patterns and allow underlying labour market movements to be compared more effectively over time.
+* Is underemployment meaningfully linked to overall labour underutilisation in Australia between 2016 and 2025?
+* Do males and females contribute differently to total underemployment over time?
+* Is the gender gap in underemployment associated with changes in the labour underutilisation rate?
 
-The [ABS](https://www.abs.gov.au/methodologies/labour-force-australia-methodology/apr-2026) notes that labour market conditions experienced substantial disruption during the COVID-19 period (April 2020 to March 2022), resulting in increased volatility and several trend breaks. Consequently, caution is exercised when interpreting labour market movements during this period.
+Why this question? Economic disruptions rarely affect all groups equally. Certain sectors absorb more shock than others, and because men and women are not distributed evenly across industries, labour market stress can fall differently across genders.This raises a genuine question: when underemployment surged in Australia, did one gender bear a disproportionate share of that burden — and did that imbalance drive overall labour underutilisation? 
 
-#### Data Processing
 
-**Data Import**
+**Source and Suitability** 
 
-* Imported all ABS datasets into R using the `read_csv()` function from the readr package.
-Excluded the title row from the total underemployment dataset using skip = 1.
+All data were obtained from the Australian Bureau of Statistics (ABS) Labour Force Survey — a monthly household survey of approximately 50,000 Australians conducted to measure employment and unemployment outcomes. As a large-scale probability sample survey, it is the most authoritative source of labour market data in Australia and is widely used by government, researchers, and policymakers. The survey directly measures underemployment, underutilisation, and unemployment, making it well suited to answering the research question.
 
-**Data Cleaning and Transformation**
+Four datasets were used:
 
-* Renamed variables to shorter and more interpretable names for ease of analysis.
-Used separate() from the tidyr package to split comma-separated text columns into individual variables.
+* Total underemployed workers (original series)
+* Underemployed workers by sex (original series)
+* Underemployment and underutilisation rates (trend and seasonally adjusted)
+* Unemployment rates (trend and seasonally adjusted)
 
-* Converted labour market measures from `character (chr)` to `numeric (dbl)` data types using `as.numeric()`.
+Data Type
 
-* Removed duplicated header rows from the underutilisation and unemployment datasets using `slice(-1)` to prevent conversion errors and missing values.
+This is sample survey data — not a census or experiment. The ABS Labour Force Survey uses a rotating sample design, meaning results are estimates with associated sampling error rather than exact population counts.
 
-**Date Processing**
+Data Licence
 
-* Converted the month variable from the original ABS format (e.g., Apr-16) to a date format using `my()` from the `lubridate package`.
+All ABS data are published under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), permitting free use, sharing, and adaptation with attribution.
 
-* Standardised the time variable across all datasets to support time-series analysis and dataset integration.
+Data Limitations
 
-**Final Dataset Preparation**
+* As sample-based estimates, all figures carry sampling error and should not be interpreted as exact counts.
+* The ABS notes that the COVID-19 period (April 2020 – March 2022) caused significant volatility and trend breaks in the series, meaning comparisons across this period require caution.
+* The gender breakdown is limited to male and female categories only, reflecting the binary classification used in ABS data collection during this period. Non-binary and gender-diverse individuals are not captured.
+* Original series data were used for underemployment counts, which means seasonal effects are not removed and may influence month-to-month comparisons.
 
-* Ensured all datasets contained consistent date variables and correctly formatted numeric measures.
+Ethical Considerations
 
-* Prepared the datasets for merging and analysis of underemployment, unemployment, and labour underutilisation trends. Derived new variables.  
+* The ABS Labour Force Survey is conducted under the Census and Statistics Act 1905, which legally protects the confidentiality of individual responses. Only aggregate, anonymised statistics are published — no individual-level data are used in this analysis.
 
-* Focused the analysis on gender differences in underemployment in Australia between 2016 and 2025.
+* No personally identifiable information is present in any dataset used, meaning there are no privacy risks associated with this analysis.
+
+* The binary gender classification in the data is a limitation worth acknowledging — findings described as "male" and "female" reflect ABS reporting categories and may not fully represent the diversity of gender identities in the Australian workforce.
+
+
+### Downloading the Data
+
+All datasets were downloaded directly from the ABS Labour Force Survey publications. To reproduce this:
+
+1. Go to the ABS Labour Force Survey page: [Labour Force Survey](https://www.abs.gov.au/methodologies/labour-force-australia-methodology/apr-2026)
+2. Navigate to the **Data downloads** section of the most recent release.
+3. Download the following Excel tables and export the relevant sheets as `.csv` files:
+   - **Table 1** → Total underemployed workers (Original series) → saved as `Chart 1_ Underemployed workers, Original.csv`
+   - **Table 5** → Underemployed workers by Sex (Original series) → saved as `Chart 5_ Underemployed workers, by Sex, Original.csv`
+   - Underemployment and underutilisation rates → saved as `Underemployment rate and underutilisation rate.csv`
+   - Unemployment rates → saved as `Unemployment rate.csv`
+4. Place all raw `.csv` files into a `data/` folder within the project directory before running any code.
+
+### Processing Steps
+
+**Step 1 — Import**
+
+All four datasets were imported using `read_csv()` from the `readr` package. The total underemployment dataset required `skip = 1` to bypass the title row. The remaining three datasets were read as single comma-separated text columns requiring further restructuring.
+
+**Step 2 — Restructuring**
+
+- The total underemployment dataset was renamed using `rename()` to give variables shorter, interpretable names (`hours_reduced`, `prefers_more`, `total_underemp`).
+- The gender, underutilisation, and unemployment datasets each arrived as a single column of comma-separated text. `separate()` from `tidyr` was used to split each into individual named variables.
+
+**Step 3 — Removing Duplicate Headers**
+
+The underutilisation and unemployment datasets contained a repeated header row after separation. This was removed using `slice(-1)`. The gender dataset contained a row where `month == "month"` which was removed using `filter()`.
+
+**Step 4 — Type Conversion**
+
+All labour market measure columns were converted from `character (chr)` to `numeric (dbl)` using `as.numeric()`. Rows that could not be converted became `NA` and were subsequently removed using `filter(!is.na(month))`.
+
+**Step 5 — Date Formatting**
+
+The `month` variable was converted from ABS format (e.g., `Apr-16`) to a proper R date object using `my()` from the `lubridate` package, applied consistently across all four datasets.
+
+**Step 6 — Duplicate Checks**
+
+`count(month)` followed by `filter(n > 1)` was run on each dataset to confirm no duplicated monthly observations existed before merging.
+
+**Step 7 — Merging**
+
+The four datasets were merged into a single working dataset (`labour_data`) using two successive `left_join()` operations on the `month` variable, anchored to the gender dataset. The final dataset was filtered to cover **June 2016 to December 2025**.
+
+**Step 8 — Derived Variables**
+
+The following variables were derived within `labour_data` using `mutate()`:
+
+| Variable | Formula |
+|---|---|
+| `Tot_male_underemp` | `male_prefers_more_hours + male_hours_reduced` |
+| `Tot_female_underemp` | `female_prefers_more_hours + female_hours_reduced` |
+| `total_underemp` | `Tot_male_underemp + Tot_female_underemp` |
+| `male_share` | `Tot_male_underemp / total_underemp × 100` |
+| `female_share` | `Tot_female_underemp / total_underemp × 100` |
+| `share_gap` | `male_share − female_share` |
+
 
 
 ### Remember
 
-Please mention any additional files that you want the markers to review, eg. read me, meta data etc.
+Kindly look into the ReadME file for change in approach. 
 
 <!-- Task 2 Tab: Writing your blogpost -->
 
@@ -460,6 +526,10 @@ ggplot(
   theme_minimal()
 
 ```
+```{r Saving-Processed-Dataset}
+write_csv(labour_data, "data/labour_data_processed.csv")
+write_csv(share_yearly, "data/share_yearly_processed.csv")
+```
 
 ### So, Does Gender Matter? 
 
@@ -479,14 +549,7 @@ By widening the lens, the U-series reveals that Australia's spare labour capacit
 
 ```
 
-There is no strict structure for you to follow. However, here is a skeleton structure you may find helpful.
-
-1.  Title (is set at the top of this document)
-2.  Motivation\
-3.  Data\
-4.  Analysis\
-5.  Conclusions\
-6.  References
+### References
 
 <!-- Task 3 Tab: Behind the Scenes -  -->
 
