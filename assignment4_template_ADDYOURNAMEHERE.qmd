@@ -246,12 +246,12 @@ This blog investigates: Does gender difference in underemployment contribute to 
 * Do males and females contribute differently to total underemployment over time?
 * Is the gender gap in underemployment associated with changes in the labour underutilisation rate?
 
-Why this question? Economic disruptions rarely affect all groups equally. Certain sectors absorb more shock than others, and because men and women are not distributed evenly across industries, labour market stress can fall differently across genders.This raises a genuine question: when underemployment surged in Australia, did one gender bear a disproportionate share of that burden — and did that imbalance drive overall labour underutilisation? 
+Why this question? Economic disruptions rarely affect all groups equally. Certain sectors absorb more shock than others, and because men and women are not distributed evenly across industries, labour market stress can fall differently across genders.This raises a genuine question: when underemployment surged in Australia, did one gender bear a disproportionate share of that burden. Did that imbalance drive overall labour underutilisation? 
 
 
 **Source and Suitability** 
 
-All data were obtained from the Australian Bureau of Statistics (ABS) Labour Force Survey — a monthly household survey of approximately 50,000 Australians conducted to measure employment and unemployment outcomes. As a large-scale probability sample survey, it is the most authoritative source of labour market data in Australia and is widely used by government, researchers, and policymakers. The survey directly measures underemployment, underutilisation, and unemployment, making it well suited to answering the research question.
+All data were obtained from the Australian Bureau of Statistics (ABS) Labour Force Survey which is a [Monthly household survey](https://www.abs.gov.au/methodologies/labour-force-australia-methodology/apr-2026) of approximately 50,000 Australians and 24,000 dwellings conducted to measure employment and unemployment outcomes. As a large-scale probability sample survey, it is the most authoritative source of labour market data in Australia and is widely used by government, researchers, and policymakers. The survey directly measures underemployment, underutilisation, and unemployment, making it well suited to answering the research question.
 
 Four datasets were used:
 
@@ -345,7 +345,7 @@ The following variables were derived within `labour_data` using `mutate()`:
 
 ### Remember
 
-Kindly look into the ReadME file for change in approach. 
+Kindly look into the ReadME file for further information of the Dataset and Question approach. 
 
 <!-- Task 2 Tab: Writing your blogpost -->
 
@@ -406,7 +406,7 @@ ggplot(
 ```
 ### Do Males and Females Contribute Differently to Underemployment?
 
-At first glance, Figure @fig-gender-share may look a little uneventful—and that is exactly what makes it interesting. While overall underemployment rose and fell dramatically over the decade, the *split between males and females barely changed*.
+At first glance, @fig-gender-share may look a little uneventful—and that is exactly what makes it interesting. While overall underemployment rose and fell dramatically over the decade, the *split between males and females barely changed*.
 
 Male workers consistently accounted for a slightly larger share of total underemployment, contributing around 52–54% of underemployed workers, while females accounted for approximately 46–48%. Even during the COVID-19 disruption, when underemployment surged across Australia, the gender balance remained remarkably stable.
 
@@ -545,19 +545,67 @@ Do the current mechanism at place tell the whole labour market story? The ABS sa
 
 By widening the lens, the U-series reveals that Australia's spare labour capacity is much larger than unemployment figures alone suggest. In short, the labour market is not just about who has a job and who does not—it's also about who wants more work, more hours, or a better opportunity than the one they currently have.
 
-```{r}
-
-```
-
 ### References
+
+* Australian Bureau of Statistics (Reference period: February 2025) 'Underemployed Workers' [data set](https://www.abs.gov.au/statistics/labour/employment-and-unemployment/underemployed-workers/feb-2025), Underemployed Workers, Australia, February 2025
+
+
+* Australian Bureau of Statistics (Reference period: April 2025) 'Underemployment and Underutilisation: Introducing the U-series' [article](https://www.abs.gov.au/articles/underemployment-and-underutilisation-introducing-u-series), Underemployment and Underutilisation: Introducing the U-series, 
+
+* Australian Bureau of Statistics (Reference period: Latest release) 'Labour Force Australia – Underemployment' [data set](https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia/latest-release#underemployment), Labour Force, Australia, 
+
+* Australian Bureau of Statistics (Reference period: 2023) 'Underutilised Labour' [methodology](https://www.abs.gov.au/statistics/detailed-methodology-information/concepts-sources-methods/labour-statistics-concepts-sources-and-methods/2023/concepts-and-sources/underutilised-labour), Labour Statistics: Concepts, Sources and Methods, 2023, 
+
+
+* R Core Team (2025) R: A Language and Environment for Statistical Computing [software], R Foundation for Statistical Computing, Vienna, Austria, https://www.r-project.org/
+
+* Wickham H. (2016) ggplot2: Elegant Graphics for Data Analysis [R package](https://ggplot2.tidyverse.org/), Springer-Verlag New York, 
+
+* Grolemund G. and Wickham H. (2011) lubridate: Make Dealing with Dates a Little Easier [R package](https://lubridate.tidyverse.org/)
 
 <!-- Task 3 Tab: Behind the Scenes -  -->
 
 ## Behind the Scenes
 
-### What's in this section
+*Tell us about parts of your data processing or analysis that weren’t “sexy” and wouldn’t typically be included in a blog post. (e.g. Was their any data drudgery or time intensive wrangling? Were there any repetitive tasks or manual tasks? If it was easy, describe what made it easy?*
 
-Here is where you should tell us about your reflection on your analysis (Task 3).
+The initial approach did not exactly fit well to show my skills I have learnt in this unit, hence keeping same dataset which were two initially and then adding more dataset was a bit tedious and the issues while analysing relating to it: 
 
-Again, these are the details about **your** perspective and the gritty details behind the scenes of your analysis.
+* Finding the data that was going to answer my questions were multiple, and the metrics also differed. It was difficult to boil down to the right ones. 
+
+* While the trend % was present with seasonal adjustment for COVID-19 years, the actual trends had no data, so I had to be careful that they did not cause an outlier that would completely throw my question out of context. 
+
+
+*Were there any challenges that you faced in conducting this analysis. These may take the form of data limitations or coding challenges? (e.g. Was there anything in your analysis that you were not anticipating when you started? Did you have to change your intended scope? Did you need to master a new skill? Were there any problems you were proud of solving?)*
+
+* The data such as Underutilisation rate is not present as Gender specific on ABS website, hence I had to manually derive certain variable. 
+
+* The surprise came when my code started to break right after reading my files. THEY WERE NOT READ AS CSV! I had to clean every data with code to make it read like a CSV. 
+
+* My left_join kept breaking and it took a lot of time to understand what might have been wrong in that. 
+
+* Repetitive layers of filtration and tidy process, along with deciding to choose the right kind of visualisation was a lengthy process. 
+
+
+*Tell us about any imperfect parts of your work and how you would like to expand or improve this analysis in future? Be clear about any limitations or aspects of your analysis that fell beyond scope.*
+
+I think where I had to certainly compromise on my analysis was the actual reflection of COVID 19. In my understanding, the female section would have been affected more, but surprisingly that was very minimal given the limitation of data. I would have also wanted to include payscale, job vacancies and maybe explore the age factor as well here. 
+
+*Tell us about how you used AI in your approach to your assignment. (e.g. Was AI consistently reliable? Did you provide AI with additional context? Was there anywhere where you questioned or verified the AI outputs? Was there anywhere we AI helped you learn something new?)*
+
+AI was helpful to understand about my coding issues. However, it did misguide me to some extent to think my approach did not make sense. It gave me suggestions that did not align with what I wanted. However, it gave me conceptual understanding that my variables made meaning. It helped me understand the linkage and that further helped me critical think how I could use it to use it in the analysis. 
+
+*Submit 4 earlier versions of your .qmd files to show your iterative process. These versions must show iterations of your work (not just a linear progression of Task 1, Task 2, Task 3, citations). Reflect on the progress made between each versions by providing a short statement for markers of what you fixed/learnt/improved/changed between each file. Also like to reflect on what changed between your first checklist submission. (Note: There is an expectation for students familiar with GitHub that you will submit a Github repository and refer to 4 individual commits.)* 
+
+I have used the Github to **Tag** my versions of work. In most cases my issues were to go back and update the steps of data processing. Making changes in wordings and visualisation. Please find the [GitHub](https://github.com/somya090997/ETC5512_Assig4)
+
+
+# AI Acknowledgement
+
+Generative Artificial Intelligence (ChatGPT by OpenAI) was used to assist with aspects of this assignment. AI support was used for brainstorming potential analytical approaches, understanding ABS labour market concepts, debugging R code, interpreting data cleaning issues, refining visualisation choices, and improving the clarity and structure of written explanations. 
+
+AI-generated suggestions were critically evaluated, modified where necessary, and independently implemented by the author. All data collection, cleaning, analysis, visualisation, interpretation of results, and final conclusions were completed and verified by the author. AI was used as a learning and productivity aid rather than a substitute for original analytical work.
+
+Please find the [AI Prompts](https://chatgpt.com/share/6a2e1945-f8a4-83ec-aa09-9d30349b6813)
+
 :::
